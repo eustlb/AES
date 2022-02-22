@@ -223,13 +223,11 @@ void AESEncrypt(uint8_t ciphertext[DATA_SIZE], uint8_t plaintext[DATA_SIZE] , ui
    // 2nd : first AddRoundKey between initial block and initial key
    copyArray2D(block, ciphered_block, 4);
    AddRoundKey(ciphered_block, master_key);
-
+   trigger_high();
    // 3nd : run the 10 rounds
    for (int k=0; k<10; k++){
       // SubBytes
-      trigger_high();
       SubBytes(ciphered_block);
-      trigger_low();
       // ShiftRows
       ShiftRows(ciphered_block);
       // MixColumns, not done at the final round (k=9)
@@ -240,6 +238,7 @@ void AESEncrypt(uint8_t ciphertext[DATA_SIZE], uint8_t plaintext[DATA_SIZE] , ui
       // AddRoundKey
       AddRoundKey(ciphered_block, roundkeys[k]);
    }
+   trigger_low();
    for (int i=0; i<STATE_ROW_SIZE; i++){
       for (int j=0; j<STATE_COL_SIZE; j++){
          ciphertext[STATE_COL_SIZE*i+j] = ciphered_block[i][j] ;
