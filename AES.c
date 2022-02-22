@@ -227,5 +227,12 @@ void AESEncrypt_128block(uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE],
    }
 };
 
+int main() {
+
+   uint8_t ciphered_block [STATE_ROW_SIZE][STATE_COL_SIZE];
+   AESEncrypt_128block(ciphered_block,block,master_key);
+
+}
+
 
 #endif
