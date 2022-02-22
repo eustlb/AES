@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "hal.h"
-#include "Simpleserial.h"
+#include "simpleserial.h"
 
 // the round that will trigger
 extern uint8_t targeted_round;
