@@ -37,17 +37,17 @@ static const uint8_t Rcon[4][10] = {
   {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
   {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} };
 
-static const uint8_t master_key [STATE_ROW_SIZE][STATE_COL_SIZE] = {
-  {0x2b, 0x28, 0xab, 0x09},
-  {0x7e, 0xae, 0xf7, 0xcf}, 
-  {0x15, 0xd2, 0x15, 0x4f}, 
-  {0x16, 0xa6, 0x88, 0x3c} };
+static const uint8_t master_key [DATA_SIZE] = {
+  0x2b, 0x28, 0xab, 0x09,
+  0x7e, 0xae, 0xf7, 0xcf, 
+  0x15, 0xd2, 0x15, 0x4f, 
+  0x16, 0xa6, 0x88, 0x3c };
 
-static const uint8_t block [STATE_ROW_SIZE][STATE_COL_SIZE] = {
-  {0x32, 0x88, 0x31, 0xe0},
-  {0x43, 0x5a, 0x31, 0x37}, 
-  {0xf6, 0x30, 0x98, 0x07}, 
-  {0xa8, 0x8d, 0xa2, 0x34} };
+static const uint8_t block [DATA_SIZE] = {
+  0x32, 0x88, 0x31, 0xe0,
+  0x43, 0x5a, 0x31, 0x37, 
+  0xf6, 0x30, 0x98, 0x07, 
+  0xa8, 0x8d, 0xa2, 0x34 };
 
 static const uint8_t gf_by2 [256] = {
 0x00,0x02,0x04,0x06,0x08,0x0a,0x0c,0x0e,0x10,0x12,0x14,0x16,0x18,0x1a,0x1c,0x1e,
@@ -85,10 +85,6 @@ static const uint8_t gf_by3 [256] = {
 0x6b,0x68,0x6d,0x6e,0x67,0x64,0x61,0x62,0x73,0x70,0x75,0x76,0x7f,0x7c,0x79,0x7a, 
 0x3b,0x38,0x3d,0x3e,0x37,0x34,0x31,0x32,0x23,0x20,0x25,0x26,0x2f,0x2c,0x29,0x2a,
 0x0b,0x08,0x0d,0x0e,0x07,0x04,0x01,0x02,0x13,0x10,0x15,0x16,0x1f,0x1c,0x19,0x1a
-};
-
-void AESEncrypt(uint8_t ciphertext[DATA_SIZE], uint8_t plaintext[DATA_SIZE] , uint8_t key[DATA_SIZE]){
-
 };
 
 void AddRoundKey( uint8_t state [STATE_ROW_SIZE][STATE_COL_SIZE], uint8_t roundkey [STATE_ROW_SIZE][STATE_COL_SIZE]){
@@ -200,7 +196,26 @@ void MixColumns(uint8_t state [STATE_ROW_SIZE][STATE_COL_SIZE], uint8_t result [
    }
 };
 
-void AESEncrypt_128block(uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE], uint8_t block[STATE_ROW_SIZE][STATE_COL_SIZE] , uint8_t master_key[STATE_ROW_SIZE][STATE_COL_SIZE]){
+void AESEncrypt(uint8_t ciphertext[DATA_SIZE], uint8_t plaintext[DATA_SIZE] , uint8_t key[DATA_SIZE]){
+   uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE];
+   
+   uint8_t block[STATE_ROW_SIZE][STATE_COL_SIZE];
+   for (int i=0; i<STATE_ROW_SIZE; i++){
+      for (int j=0; j<STATE_COL_SIZE; j++){
+         block[i][j] = plaintext[STATE_COL_SIZE*i+j];
+      }
+   }
+   print2D(block);
+   printf("\n");
+   uint8_t master_key[STATE_ROW_SIZE][STATE_COL_SIZE];
+   for (int i=0; i<STATE_ROW_SIZE; i++){
+      for (int j=0; j<STATE_COL_SIZE; j++){
+         master_key[i][j] = key[STATE_COL_SIZE*i+j];
+      }
+   }
+   print2D(master_key);
+   printf("\n");
+
    // 1st : let's generate all the round keys 
    uint8_t roundkeys [10][STATE_ROW_SIZE][STATE_COL_SIZE];
    KeyGen(roundkeys,master_key);
@@ -225,14 +240,11 @@ void AESEncrypt_128block(uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE],
       // AddRoundKey
       AddRoundKey(ciphered_block, roundkeys[k]);
    }
+   for (int i=0; i<STATE_ROW_SIZE; i++){
+      for (int j=0; j<STATE_COL_SIZE; j++){
+         ciphertext[STATE_COL_SIZE*i+j] = ciphered_block[i][j] ;
+      }
+   }
 };
-
-int main() {
-
-   uint8_t ciphered_block [STATE_ROW_SIZE][STATE_COL_SIZE];
-   AESEncrypt_128block(ciphered_block,block,master_key);
-
-}
-
 
 #endif
