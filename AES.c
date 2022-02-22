@@ -6,6 +6,8 @@
 #define STATE_COL_SIZE 4 
 #include <stdint.h>
 #include <stdio.h>
+#include "hal.h"
+#include "Simpleserial.h"
 
 // the round that will trigger
 extern uint8_t targeted_round;
@@ -210,7 +212,9 @@ void AESEncrypt_128block(uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE],
    // 3nd : run the 10 rounds
    for (int k=0; k<10; k++){
       // SubBytes
+      trigger_high();
       SubBytes(ciphered_block);
+      trigger_low();
       // ShiftRows
       ShiftRows(ciphered_block);
       // MixColumns, not done at the final round (k=9)
