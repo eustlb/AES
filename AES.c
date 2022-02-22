@@ -227,7 +227,5 @@ void AESEncrypt_128block(uint8_t ciphered_block[STATE_ROW_SIZE][STATE_COL_SIZE],
    }
 };
 
-extern extern extern 
-#endif
 
-const uint8_t rcon [10]; const uint8_t sboxtab [256]; const uint8_t invsbox [256];
+#endif
